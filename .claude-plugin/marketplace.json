@@ -1,0 +1,20 @@
+{
+  "name": "livlign",
+  "owner": { "name": "livlign" },
+  "plugins": [
+    {
+      "name": "tech-lead",
+      "source": "./plugins/tech-lead",
+      "description": "Tech-lead lifecycle skills: weekly meeting agenda + meeting summary, tracer-bullet debugging pattern (BE+FE), and a two-pass codebase comparison report (default file tools vs ast-graph).",
+      "version": "0.1.0",
+      "keywords": ["tech-lead", "engineering-management", "meetings", "agenda", "tracer", "debugging", "codebase-analysis", "ast-graph", "team-workflow"]
+    },
+    {
+      "name": "dev-agent",
+      "source": "./plugins/dev-agent",
+      "description": "Orchestrator for taking a development task through 9 phases — grooming → requirements → architecture → task plan → tech spec → tests → implementation → e2e → patch — with light reviewer gates between AI phases. Stack-agnostic.",
+      "version": "0.1.0",
+      "keywords": ["tech-lead", "dev-agent", "workflow", "grooming", "tech-spec", "tdd", "code-review", "engineering-management", "sub-agents"]
+    }
+  ]
+}

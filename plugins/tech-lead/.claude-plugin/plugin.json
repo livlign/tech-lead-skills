@@ -1,0 +1,9 @@
+{
+  "name": "tech-lead",
+  "version": "0.1.0",
+  "description": "Tech-lead lifecycle skills: weekly meeting agenda + meeting summary, tracer-bullet debugging pattern (BE+FE), and a two-pass codebase comparison report (default file tools vs ast-graph).",
+  "author": { "name": "livlign" },
+  "homepage": "https://github.com/livlign/tech-lead-skills",
+  "repository": "https://github.com/livlign/tech-lead-skills",
+  "keywords": ["tech-lead", "engineering-management", "meetings", "agenda", "tracer", "debugging", "codebase-analysis", "ast-graph", "team-workflow"]
+}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan {{REPO_NAME}} — ast-graph vs Claude tools</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f7fb;
+    color: #0f172a;
+    padding: 22px 32px 28px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 16px;
+  }
+  h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  .subtitle { color: #64748b; font-size: 14px; font-weight: 500; }
+
+  .grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .pos-scan       { grid-area: 1 / 1; }
+  .pos-repo       { grid-area: 2 / 1; }
+  .pos-hotspots   { grid-area: 3 / 1; }
+  .pos-advantages { grid-area: 1 / 2; }
+  .pos-cheatsheet { grid-area: 2 / 2 / 4 / 3; }
+
+  .panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px 18px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+
+  /* Scan progress */
+  .scan-progress .approaches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .approach-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .approach-box.faster {
+    background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%);
+    border-color: #86efac;
+    box-shadow: 0 0 0 2px rgba(34,197,94,0.10);
+  }
+  .approach-name {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #0f172a;
+  }
+  .fast-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    color: #15803d;
+    background: #bbf7d0;
+    padding: 3px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-left: 6px;
+    vertical-align: 2px;
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+  }
+  .progress-row + .progress-row { border-top: 1px dashed #e2e8f0; }
+  .progress-label { color: #64748b; font-size: 13px; font-weight: 600; }
+  .progress-value { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; }
+  .progress-value.time-fast { color: #15803d; }
+
+  /* Advantages */
+  .advantages .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .adv-title { font-size: 15px; font-weight: 800; margin-bottom: 8px; }
+  .adv-title.claude { color: #be123c; }
+  .adv-title.ast { color: #0369a1; }
+  .advantages ul { margin: 0; padding-left: 18px; }
+  .advantages li {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #334155;
+    margin: 5px 0;
+  }
+  .advantages li strong { color: #0f172a; }
+
+  /* Repo info */
+  .repo-info .rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 20px;
+  }
+  .repo-info .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .repo-info .rows > .row:nth-last-child(-n+3) { border-bottom: none; }
+  .repo-info .k { color: #64748b; font-size: 13px; font-weight: 600; }
+  .repo-info .v { font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em; }
+  .repo-info .v small { color: #94a3b8; font-size: 11px; font-weight: 500; }
+
+  /* Hotspots */
+  .hotspots .list { display: flex; flex-direction: column; gap: 10px; }
+  .hotspot-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    background: #fafbfd;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+  .hotspot-number {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #0369a1;
+    line-height: 1;
+  }
+  .hotspot-number small {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 4px;
+  }
+  .hotspot-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    word-break: break-word;
+    margin-bottom: 3px;
+  }
+  .hotspot-desc {
+    font-size: 12.5px;
+    color: #64748b;
+    line-height: 1.4;
+  }
+  .src-tag {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
+    vertical-align: 2px;
+  }
+  .src-ast { color: #0369a1; background: #e0f2fe; border: 1px solid #bae6fd; }
+  .src-claude { color: #be123c; background: #ffe4e6; border: 1px solid #fecdd3; }
+
+  /* Cheatsheet */
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 7px 10px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  tbody td {
+    padding: 8px 10px;
+    font-size: 13.5px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    line-height: 1.45;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.action { font-weight: 700; color: #0f172a; width: 34%; }
+  td.best { font-weight: 800; font-size: 13px; width: 28%; }
+  td.why { color: #475569; }
+  .tag-ast { color: #0369a1; }
+  .tag-combo { color: #7c3aed; }
+
+  code {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #0f172a;
+  }
+  .legend {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.45;
+  }
+  .legend .dot {
+    display: inline-block;
+    width: 8px; height: 8px; border-radius: 999px; margin-right: 5px; vertical-align: 1px;
+  }
+  .legend .d-combo { background: #7c3aed; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Scan {{REPO_NAME}}</h1>
+  <span class="subtitle">{{FILES}} files &middot; {{LOC_SUMMARY}} &middot; {{SCAN_DATE}}</span>
+</header>
+
+<div class="grid-layout">
+
+    <!-- Scan progress -->
+    <section class="panel scan-progress pos-scan">
+      <div class="section-label">Scan progress</div>
+      <div class="approaches">
+        <div class="approach-box">
+          <div class="approach-name">Claude default tools</div>
+          <div class="progress-row"><span class="progress-label">Time</span><span class="progress-value">{{AGENT1_TIME}}</span></div>
+          <div class="progress-row"><span class="progress-label">Tokens</span><span class="progress-value">{{AGENT1_TOKENS}}</span></div>
+          <div class="progress-row"><span class="progress-label">Tool calls</span><span class="progress-value">{{AGENT1_CALLS}}</span></div>
+        </div>
+        <div class="approach-box faster">
+          <div class="approach-name">ast-graph + FalkorDB<span class="fast-badge">Faster</span></div>
+          <div class="progress-row"><span class="progress-label">Time</span><span class="progress-value time-fast">{{AGENT2_TIME}}</span></div>
+          <div class="progress-row"><span class="progress-label">Tokens</span><span class="progress-value">{{AGENT2_TOKENS}}</span></div>
+          <div class="progress-row"><span class="progress-label">Tool calls</span><span class="progress-value">{{AGENT2_CALLS}}</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Repo info -->
+    <section class="panel repo-info pos-repo">
+      <div class="section-label">Repo information &mdash; both approaches agree</div>
+      <div class="rows">
+        <div class="row"><span class="k">Files</span><span class="v">{{REPO_FILES}}</span></div>
+        <div class="row"><span class="k">LOC</span><span class="v">{{REPO_LOC}} <small>{{REPO_LOC_LANG}}</small></span></div>
+        <div class="row"><span class="k">Classes</span><span class="v">{{REPO_CLASSES}}</span></div>
+        <div class="row"><span class="k">Interfaces</span><span class="v">{{REPO_INTERFACES}}</span></div>
+        <div class="row"><span class="k">Methods</span><span class="v">{{REPO_METHODS}}</span></div>
+        <div class="row"><span class="k">Controllers</span><span class="v">{{REPO_CONTROLLERS}}</span></div>
+        <div class="row"><span class="k">Feature slices</span><span class="v">{{REPO_FEATURES}}</span></div>
+        <div class="row"><span class="k">Event handlers</span><span class="v">{{REPO_HANDLERS}}</span></div>
+        <div class="row"><span class="k">Msg consumers</span><span class="v">{{REPO_CONSUMERS}}</span></div>
+        <div class="row"><span class="k">Background jobs</span><span class="v">{{REPO_JOBS}}</span></div>
+        <div class="row"><span class="k">Enums</span><span class="v">{{REPO_ENUMS}}</span></div>
+        <div class="row"><span class="k">DB entities in-repo</span><span class="v">{{REPO_ENTITIES}} <small>{{REPO_ENTITIES_NOTE}}</small></span></div>
+      </div>
+    </section>
+
+    <!-- Hotspots -->
+    <section class="panel hotspots pos-hotspots">
+      <div class="section-label">Top hotspots &mdash; refactor candidates</div>
+      <div class="list">
+        <div class="hotspot-row">
+          <div class="hotspot-number">{{H1_NUM}}<small>{{H1_UNIT}}</small></div>
+          <div>
+            <div class="hotspot-name">{{H1_NAME}}<span class="src-tag src-{{H1_SRC}}">{{H1_SRC}}</span></div>
+            <div class="hotspot-desc">{{H1_DESC}}</div>
+          </div>
+        </div>
+        <div class="hotspot-row">
+          <div class="hotspot-number">{{H2_NUM}}<small>{{H2_UNIT}}</small></div>
+          <div>
+            <div class="hotspot-name">{{H2_NAME}}<span class="src-tag src-{{H2_SRC}}">{{H2_SRC}}</span></div>
+            <div class="hotspot-desc">{{H2_DESC}}</div>
+          </div>
+        </div>
+        <div class="hotspot-row">
+          <div class="hotspot-number">{{H3_NUM}}<small>{{H3_UNIT}}</small></div>
+          <div>
+            <div class="hotspot-name">{{H3_NAME}}<span class="src-tag src-{{H3_SRC}}">{{H3_SRC}}</span></div>
+            <div class="hotspot-desc">{{H3_DESC}}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advantages -->
+    <section class="panel advantages pos-advantages">
+      <div class="section-label">What each approach is good at</div>
+      <div class="cols">
+        <div>
+          <div class="adv-title claude">Claude default tools</div>
+          <ul>
+            <li>Works on any repo instantly, no setup.</li>
+            <li>Understands intent &mdash; comments, naming, style.</li>
+            <li>Follows clues outside code (e.g. <code>CLAUDE.md</code>).</li>
+            <li>Actually writes and edits code.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="adv-title ast">ast-graph + FalkorDB</div>
+          <ul>
+            <li>Fast &mdash; queries answer in milliseconds.</li>
+            <li>Finds hotspots across the whole codebase.</li>
+            <li>Exact counts, no grep false-positives.</li>
+            <li>Traces long call chains in one query.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cheatsheet -->
+    <section class="panel pos-cheatsheet">
+      <div class="section-label">Best approach per action</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Action</th>
+            <th>Best approach</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="action">Explore a codebase</td>
+            <td class="best tag-ast">ast-graph</td>
+            <td class="why">One query, whole-map overview.</td>
+          </tr>
+          <tr>
+            <td class="action">Find dead code / cycles</td>
+            <td class="best tag-ast">ast-graph</td>
+            <td class="why">Unreferenced nodes show up instantly.</td>
+          </tr>
+          <tr>
+            <td class="action">Refactor / rename</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph lists every caller; Claude edits safely.</td>
+          </tr>
+          <tr>
+            <td class="action">Write new features</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph shows existing patterns; Claude writes the code.</td>
+          </tr>
+          <tr>
+            <td class="action">Fix bugs</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph traces the call chain; Claude patches the file.</td>
+          </tr>
+          <tr>
+            <td class="action">Unit / integration tests</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph maps deps; Claude writes the tests.</td>
+          </tr>
+          <tr>
+            <td class="action">Code review</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph spots structural smells; Claude reads the prose.</td>
+          </tr>
+          <tr>
+            <td class="action">Architecture docs</td>
+            <td class="best tag-combo">Claude + ast-graph</td>
+            <td class="why">Graph draws the shape; Claude tells the story.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="legend">
+        <span class="dot d-combo"></span><strong>Claude + ast-graph</strong> &mdash; Claude reads the graph (via MCP or system prompt) for exact structure, then writes code. Almost always beats either alone.
+      </div>
+    </section>
+
+</div>
+
+</body>
+</html>

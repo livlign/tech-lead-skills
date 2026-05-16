@@ -1,0 +1,9 @@
+{
+  "name": "dev-agent",
+  "version": "0.1.0",
+  "description": "Orchestrator for taking a development task through 9 phases — grooming → requirements → architecture → task plan → tech spec → tests → implementation → e2e → patch — with light reviewer gates between AI phases. Stack-agnostic.",
+  "author": { "name": "livlign" },
+  "homepage": "https://github.com/livlign/tech-lead-skills",
+  "repository": "https://github.com/livlign/tech-lead-skills",
+  "keywords": ["tech-lead", "dev-agent", "workflow", "grooming", "tech-spec", "tdd", "code-review", "engineering-management", "sub-agents"]
+}
