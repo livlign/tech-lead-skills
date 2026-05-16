@@ -7,7 +7,7 @@ description: Frame the task, scan the code to verify claims, decide if architect
 
 ## Audience rule
 
-Output is for **everyone** — PM, designer, QA, business, dev. Plain language. No commit hashes, no class names, no file paths, no DB types, no enum values, no route shapes, no library jargon. The reader should understand what's happening even if they've never touched the code.
+Output is for **everyone on the team** — engineering and non-engineering alike. Plain language. No commit hashes, no class names, no file paths, no DB types, no enum values, no route shapes, no library jargon. The reader should understand what's happening even if they've never touched the code.
 
 Engineering detail moves to `output/.refs/<topic>.md` (e.g. `already-shipped.md`, `current-system.md`). The grooming doc references it with one line: *"Engineering detail: see `output/.refs/<topic>.md`."*
 
@@ -46,7 +46,7 @@ Sections:
 - **Problem** — 1–2 sentences in user/business terms. What hurts today?
 - **What we're delivering** — 1–3 sentences. What will change for the user?
 - **Decisions made** — bullet list. Business decisions only (toggle name, behaviour change, gating). No class/file/DB names.
-- **Who's affected** — small table: area of the product → what changes there. "Studio Settings page", "Imports", "Database" — not "ProductsController", "Persistence layer".
+- **Who's affected** — small table: area of the product → what changes there. Name user-facing surfaces ("the settings page", "the import flow", "the records list", "the database the app reads"), not implementation-layer artifacts (no controllers, no persistence-layer class names, no repository names).
 - **Entity ownership map** — the table from step 4. Repos named directly; this is the one section where naming services is required.
 - **Precedents** — the table from step 5. Every new behaviour paired with an existing file:line example, or flagged as net-new.
 - **Already done** (if applicable) — one paragraph. Point at `output/.refs/already-shipped.md` for engineering detail.

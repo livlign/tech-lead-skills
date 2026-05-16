@@ -31,7 +31,7 @@ Write each section down explicitly. Do not skip ahead.
 ### 1. Symptom
 
 Restate exactly what the user sees, in their words. Pin specifics:
-- Which entity / data row / studio / user?
+- Which entity / data row / tenant / account / user?
 - Which surface (tab, popup, page)?
 - Expected vs. actual outcome?
 
@@ -39,7 +39,7 @@ If the symptom is ambiguous, **ask** before reading code. Cheaper than chasing t
 
 ### 2. Surface
 
-Which UI component renders the symptom? Name the file. If the same conceptual surface (e.g. "Variants tab") exists in multiple places (standalone page, slide-in, detail page), **ask the user which one** before assuming.
+Which UI component renders the symptom? Name the file. If the same conceptual surface (e.g. "the user list", "the detail panel") exists in multiple places (standalone page, slide-in, drawer, detail view), **ask the user which one** before assuming.
 
 ### 3. Call chain
 
@@ -73,8 +73,8 @@ Aim to convert every link to **verified** before proposing a fix. Cheap wins:
 Where is the gap? Cite the evidence (line numbers, response keys, observed vs. expected values).
 
 Be specific:
-- "BE returns `sampleRequests` at line N of `VariantDto.cs`; FE reads `samples` at line M of `variantModel.ts` → field name mismatch."
-- NOT: "the samples aren't showing up."
+- "BE returns `totalCount` at line N of `<EntityDto>.<ext>`; FE reads `total` at line M of `<entityModel>.<ext>` → field name mismatch."
+- NOT: "the count isn't showing up."
 
 ### 6. Fix proposal
 

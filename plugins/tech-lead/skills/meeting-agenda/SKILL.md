@@ -21,12 +21,12 @@ Use this exact structure:
 {Date}, {Team name}
 Updates
 
-R{NNN} {Stage} Deployed
+{Release / Stage marker} Deployed
 * {TICKET-KEY} Title
 * {TICKET-KEY} Title
 
 Doing this sprint
-* {TICKET-KEY} Title - {short note: % done, or "just started", or "complete in S{NNN}?"}
+* {TICKET-KEY} Title - {short note: % done, or "just started", or "complete this sprint?"}
 * {TICKET-KEY} Title
 
 Discovering
@@ -38,20 +38,22 @@ Discussion
 * Topic: short context
 ```
 
+The `{Release / Stage marker}` is whatever identifier your team uses for the deployed batch — a release number, a sprint id, a date stamp, or just the stage name on its own. Use the team's existing convention; don't invent one.
+
 ### Section rules
 
-- **R{NNN} {Stage} Deployed** — only include if there are tickets at the deployed/release stage (UAT, staging, prod — whatever your team's promotion stage is). Otherwise omit the section entirely.
-- **Doing this sprint** — tickets at "In Progress" status, PLUS any "Ready for Dev" tickets that have started in the current sprint (check sprint assignment, not just status). The user will correct if anything is misplaced.
-- **Discovering** — tickets at "Discovery" / "Refinement" status. Include blockers inline (e.g. "blocked by {TICKET-KEY}"). Omit grooming / ready-for-grooming states unless the user asks.
+- **{Release / Stage marker} Deployed** — only include if there are tickets at the deployed/release stage (UAT, staging, prod — whatever your team's promotion stage is). Otherwise omit the section entirely.
+- **Doing this sprint** — tickets actively in flight ("In Progress" / "In Development" / "Doing" / whatever your tracker calls it), PLUS any picked-up "Ready for Dev" / "To Do" tickets that have started in the current sprint (check sprint / iteration assignment, not just status). The user will correct if anything is misplaced.
+- **Discovering** — tickets in pre-development states ("Discovery" / "Refinement" / "Spec" / "Design" — your tracker's equivalent). Include blockers inline (e.g. "blocked by {TICKET-KEY}"). Omit grooming / ready-for-grooming states unless the user asks.
 - **Do NOT include "Next sprint" or anything further out.** Weekly cadence means upcoming work is covered next time.
-- **Backlog and Released** are not listed — they're for the team's board, not the agenda.
+- **Backlog and Released / Done** are not listed — they're for the team's board, not the agenda.
 
 ### Inline notes — keep them short
 
 After a ticket title, add one short note only when it adds signal:
 - Progress: `- 86%`, `- 25%`
 - Just started: `- just started`
-- Release plan: `- complete in S{NNN}?`, `- plan release R{NNN}`
+- Release plan: `- complete this sprint?`, `- plan next release` (or use your team's sprint / release identifier if you have one)
 - Blocker: `(blocked by {TICKET-KEY})`
 - Status check: `- Confirm list APIs will be supported`
 
@@ -116,38 +118,38 @@ Match their corrections exactly — don't re-expand notes they shortened.
 ## Style guide
 
 - Sentence-case headings, no markdown bold inside bullets
-- Use `-` as the bullet marker on inline notes after the title (e.g. `TKT-1004 Rebrand - just started`)
+- Use `-` as the bullet marker on inline notes after the title (e.g. `TKT-1004 <feature title> - just started`)
 - Use `(parenthetical)` for blockers
-- Keep ticket titles short — strip obvious project prefixes (e.g. "Product Hub:"), but keep the core noun phrase
+- Keep ticket titles short — strip obvious project prefixes (e.g. "<Product Name>:"), but keep the core noun phrase
 - No emojis, no decorative formatting
 
 ## Example
 
 ```
-May 13, 2026 — Team 1: Product Intelligence
+May 13, 2026 — Team A
 Updates
 
-R202 UAT Deployed
-* TKT-1250 Event Log
-* TKT-1257 CSV Export
-* TKT-1285 Feedback Apr 17
+Pre-prod Deployed
+* TKT-1250 Feature One
+* TKT-1257 Feature Two
+* TKT-1285 Feedback batch — Apr 17
 
 Doing this sprint
-* TKT-1200 Data enablement - 90%
-* TKT-1168 Simpler product creation
-* TKT-1005 Sample Logic
-* TKT-1004 Rebrand - complete in S203?
+* TKT-1200 Feature Three - 90%
+* TKT-1168 Feature Four
+* TKT-1005 Feature Five
+* TKT-1004 Feature Six - complete this sprint?
 
 Discovering
 * TKT-1203 Public API - Confirm list APIs will be supported
-* TKT-1153 Outfit Builder - Dev start discovery this sprint (S203)
+* TKT-1153 Feature Seven - Dev start discovery this sprint
 
 Discussion
 * Migration: pending confirmation from some customers
-* Rebranding: plan release R203
+* Feature Six: plan next release
 * Public API + Webhooks: walk through draft API list
-* Outfit View prototype
-* Customer feedback triage for H2 roadmap
+* Feature Seven prototype
+* Customer feedback triage for next-half roadmap
 ```
 
 ## What to omit

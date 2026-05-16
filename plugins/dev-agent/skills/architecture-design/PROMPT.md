@@ -13,7 +13,7 @@ custom-GPT instructions, or paste-into-chat block. Generated from SKILL.md
 
 ## Audience rule
 
-High-level shape. Readable by a tech-aware PM or QA, but **accuracy beats brevity**. Names of services, repos, databases, and persistent stores must match what's in the codebase — not friendly substitutes. Verify by reading the target repos' top-level docs, config files, and persistence-layer classes before writing names into the doc.
+High-level shape. Readable by any technical reviewer on the team — engineering or otherwise — but **accuracy beats brevity**. Names of services, repos, databases, and persistent stores must match what's in the codebase — not friendly substitutes. Verify by reading the target repos' top-level docs, config files, and persistence-layer classes before writing names into the doc.
 
 - **Services / repos** — use the actual repo or service name. Add a one-phrase role gloss only if useful.
 - **Databases / persistent stores** — use the actual DB name or persistence-context name from the code. Don't invent shorthand if the code doesn't use it.
@@ -56,15 +56,15 @@ No new service / module / wire format / contract **and** the shape is already wr
 4. List repos / services that change or get created.
 5. List communication interfaces between them (REST, gRPC, queue, pub-sub, in-process). Name the queue / topic / route shape when known.
 6. Mark each component **net-new** or **reuse**.
-7. Draw **one Mermaid sequence diagram per non-trivial flow** in the requirements (UC1..UCn). Skip use cases that are static visibility, single-call CRUD, or read-only display — they don't earn a diagram. Plus **one** data-flow diagram (Mermaid `flowchart`) showing how data moves between components and stores.
+7. Draw **one sequence diagram per non-trivial flow** in the requirements (UC1..UCn) — Mermaid is the default since it renders inline in most Markdown viewers, but use whatever diagram tool your team prefers (PlantUML, Excalidraw, drawio, ASCII). Skip use cases that are static visibility, single-call CRUD, or read-only display — they don't earn a diagram. Plus **one** data-flow diagram showing how data moves between components and stores.
 8. **High level only.** No file paths, no class names, no SQL — except in the precedent citations (step 2) where `file:line` is required.
 
-**Mermaid sequence-diagram pitfalls.** The parser is fragile. Avoid the following in message bodies, `Note over` text, and `alt` / `else` labels:
+**Mermaid sequence-diagram pitfalls** (skip if using a different tool). The Mermaid parser is fragile. Avoid the following in message bodies, `Note over` text, and `alt` / `else` labels:
 
 - **Double-quoted phrases** (`"foo"`) → drop the quotes.
 - **Semicolons** in any line → replace with `and`.
 - **Parenthesised sub-clauses with internal commas** like `(foo, bar)` or `(foo: x)` → rewrite as plain prose. Single-word parens (`(rows)`) tend to work; longer ones don't.
-- **Parenthesised `else` labels** like `else Multiple Variants (product code)` → rewrite (`else Multiple Variants from a product code`).
+- **Parenthesised `else` labels** like `else Multiple Matches (lookup key)` → rewrite (`else Multiple Matches from a lookup key`).
 - **`<br/>` immediately followed by `(`** in a message body — the parser stumbles on the combination.
 - Slashes (`/`) and dashes inside parens are usually fine; the trouble is the *combination* of parens + commas + line-break tags.
 

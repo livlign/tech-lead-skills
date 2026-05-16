@@ -7,7 +7,7 @@ description: Turn the groomed task into use cases anyone can read.
 
 ## Audience rule
 
-Output is for **everyone** — PM, designer, QA, business, dev. Plain language. No class names, no SQL, no endpoint paths, no library jargon. A QA reading this doc must be able to write test cases without asking an engineer.
+Output is for **everyone on the team** — engineering and non-engineering alike. Plain language. No class names, no SQL, no endpoint paths, no library jargon. A non-engineering reviewer must be able to derive test cases from this doc without asking an engineer.
 
 Engineering detail (entity names, schema, IDs, error codes) goes to `output/.refs/<topic>.md`.
 
@@ -27,10 +27,10 @@ Engineering detail (entity names, schema, IDs, error codes) goes to `output/.ref
 Required: **Trigger**, **Steps** (or **Outcome** for one-step flows), **Outcome**, **Acceptance criteria**.
 Optional, add when they earn their keep: **Precondition**, **Edge cases**.
 
-- **Trigger** — the event that starts the flow ("operator scans a code", "import job runs", "user opens Studio Settings").
-- **Precondition** — the state that must already hold (add-on present, scan mode is X, user is logged in). Skip if obvious from the trigger.
+- **Trigger** — the event that starts the flow ("user submits a code", "import job runs", "user opens Settings").
+- **Precondition** — the state that must already hold (feature flag on, user is logged in, account on a given plan). Skip if obvious from the trigger.
 - **Steps** — numbered. User actions and system responses interleaved as a dialogue. Drop this field for trivial single-step flows; the Outcome alone is enough.
-- **Outcome** — the postcondition, written so QA can verify it ("sample exists and is checked in", "toggle value is persisted").
+- **Outcome** — the postcondition, written so QA can verify it ("record exists and is linked", "toggle value is persisted").
 - **Edge cases** — alternative paths, cancels, failures. Skip if there genuinely aren't any.
 - **Acceptance criteria** — required when the UC has any user-visible behaviour. One bullet per AC, Given-When-Then in a single sentence. Skip only for pure system invariants (the `**The system shall …**` line is the AC).
 
@@ -60,56 +60,56 @@ Phase 6 (test-authoring) and phase 8 (E2E) read this table to plan coverage.
 
 ## Output — `output/02-requirements.md`
 
-Plain language. Short sentences. PM/QA/dev can all read it.
+Plain language. Short sentences. Technical and non-technical readers should both be able to follow it.
 
 ### Multi-step example
 
 ```markdown
-## UC5 — Variants Check-In scan
-- **Trigger:** operator scans a variant code in Variants Check-In mode.
-- **Precondition:** studio has the ProductHub add-on.
+## UC5 — Sign up with email verification
+- **Trigger:** user submits the signup form.
+- **Precondition:** the email-verification feature is enabled for new signups.
 - **Steps:**
-  1. System looks up variants by the scanned code.
-  2. One match → system shows "create new sample or pick existing".
-  3. Multiple matches → user picks the variant, then "create or pick existing".
-  4. No match → user picks a product, then a new-variant form.
-  5. On "create" → system creates a sample and chains a check-in.
-  6. On "pick existing" → system check-ins the chosen sample.
-- **Outcome:** sample exists and is checked in to the chosen location.
+  1. System validates the form (email format, password strength, required fields).
+  2. Validation passes → system creates the account in "Unverified" state and sends a verification email.
+  3. Validation fails → system surfaces the per-field errors; no account is created.
+  4. User clicks the verification link in the email.
+  5. Link is valid and unexpired → system flips the account to "Verified" and signs the user in.
+  6. Link is expired or already used → system shows a "resend verification" prompt.
+- **Outcome:** the account exists and is in the correct state for the path taken.
 - **Edge cases:**
-  - Cancel at any step → return to the scan input, no changes.
-  - Check-in fails → sample stays created; user sees the error and can retry.
+  - Network failure while sending email → account stays "Unverified"; user sees a retryable error.
+  - User signs up twice with the same email → second attempt returns the existing-account error without creating a duplicate.
 
 ### Acceptance criteria
-- **AC1 (single match — auto create + check-in)** `[e2e]` — Given the operator is in Variants Check-In mode with a scan location set, when they scan a code matching one variant, then a sample is created and checked in at the scan location.
-- **AC2 (multiple matches — operator picks)** `[e2e]` — Given the scan resolves to multiple variants, when the operator picks one, then a sample is created on the picked variant and checked in.
-- **AC3 (no match — new-variant flow)** `[e2e]` — Given no variant matches, when the operator fills the new-variant form and picks a product, then the variant, sample, and check-in are all created.
-- **AC4 (cancel at any step — no changes)** `[e2e]` — Given any step before the create call, when the operator cancels, then no variant or sample is persisted.
-- **AC5 (check-in failure — sample retained)** `[integration]` — Given the sample was created, when the check-in call fails, then the sample stays and the operator sees a retryable error.
+- **AC1 (happy path — verified)** `[e2e]` — Given a fresh email, when the user submits a valid form and clicks the verification link, then the account is created and ends up in the "Verified" state, signed in.
+- **AC2 (validation fails — no account)** `[e2e]` — Given any required field is invalid, when the user submits, then per-field errors render and no account is created.
+- **AC3 (link expired — resend)** `[e2e]` — Given a verification link older than its TTL, when the user clicks it, then the user sees a "resend verification" prompt and the account remains "Unverified".
+- **AC4 (duplicate signup — no duplicate)** `[integration]` — Given an account already exists for the email, when a new signup uses the same email, then the system returns the existing-account error and no duplicate account is persisted.
+- **AC5 (email send fails — account retained)** `[integration]` — Given the account was created, when the verification-email send fails, then the account stays "Unverified" and the user sees a retryable error.
 ```
 
 ### Simple example
 
 ```markdown
-## UC1 — Toggle "Create samples from import"
-- **Trigger:** user changes the toggle in Studio Settings and saves.
-- **Outcome:** the new value is persisted and effective for subsequent imports.
+## UC1 — Toggle "Email me on weekly summary"
+- **Trigger:** user changes the toggle on their profile / notification settings and saves.
+- **Outcome:** the new value is persisted and applied on subsequent weekly summary sends.
 
 ### Acceptance criteria
-- **AC1 (save persists)** `[integration]` — Given the toggle is changed, when the user saves, then the new value is persisted at studio scope and read by subsequent imports.
+- **AC1 (save persists)** `[integration]` — Given the toggle is changed, when the user saves, then the new value is persisted at user scope and read by subsequent weekly summary jobs.
 ```
 
 ### System-driven flow (no human actor)
 
 ```markdown
-## UC6 — Import gating
-- **Trigger:** import job runs.
+## UC6 — Weekly summary send
+- **Trigger:** weekly summary job runs.
 - **Steps:**
-  1. System reads the studio's two toggles.
-  2. Master off → no samples created; products land in "Waiting for sample".
-  3. Master on, default off → samples created only for rows that explicitly request one.
-  4. Master on, default on → one default sample per product.
-- **Outcome:** import completes; samples reflect the toggle state.
+  1. System enumerates users whose weekly-summary toggle is on.
+  2. For each user, system composes a summary from their last-7-day activity.
+  3. System sends the email through the configured transport.
+  4. Send failures are queued for retry.
+- **Outcome:** every opted-in user receives a summary; transient failures retry on the next pass.
 ```
 
 For pure system invariants (no flow at all), a single `**The system shall …**` line is enough.

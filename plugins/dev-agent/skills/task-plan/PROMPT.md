@@ -13,7 +13,7 @@ custom-GPT instructions, or paste-into-chat block. Generated from SKILL.md
 
 ## Audience rule
 
-The plan is read by PMs, leads, and devs alike. Each task says **what changes for the user** and **how we'll know it works** in plain language. Repo names are fine; class/file/SQL names belong in `output/.refs/<topic>.md` or in step 5 (Tech Spec).
+The plan is read by stakeholders across the team — engineering and non-engineering alike. Each task says **what changes for the user** and **how we'll know it works** in plain language. Repo names are fine; class/file/SQL names belong in `output/.refs/<topic>.md` or in step 5 (Tech Spec).
 
 ## Input
 
@@ -55,9 +55,9 @@ Template:
 - **Test contract:**
   | AC | Tag | Test (file:method) | new/reuse |
   |----|-----|---------------------|-----------|
-  | UC1 AC1 | `[unit]` | `…Tests/SampleSettingsTests.cs:UC1_AC1_LoadDefaults_WhenStudioFresh_ReturnsOffOff` | new |
-  | UC1 AC2 | `[integration]` | `…Tests/SampleSettingsTests.cs:UC1_AC2_SavePersists_WhenAdminSaves_NewValuePersistedStudioWide` | new |
-  | UC3 AC1 | `[unit]` | `…Tests/StatusTagTests.cs:UC3_AC1_SampleStatusTag_WhenRendered_ShowsOneOfThreeValues` | reuse (green on dev) |
+  | UC1 AC1 | `[unit]` | `…Tests/<FeatureATests>.<ext>:UC1_AC1_<ShortName>_<ExpectedOutcome>` | new |
+  | UC1 AC2 | `[integration]` | `…Tests/<FeatureATests>.<ext>:UC1_AC2_<ShortName>_<ExpectedOutcome>` | new |
+  | UC3 AC1 | `[unit]` | `…Tests/<FeatureBTests>.<ext>:UC3_AC1_<ShortName>_<ExpectedOutcome>` | reuse (green on integration branch) |
 - **Deploy plan:**
   - PRs to merge: <repo1 → dev, repo2 → dev>
   - CI jobs / pipelines: <job or pipeline paths>

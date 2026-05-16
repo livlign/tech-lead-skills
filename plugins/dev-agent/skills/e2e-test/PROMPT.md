@@ -28,8 +28,8 @@ Walk the requirements doc UC by UC and exercise every `[e2e]`-tagged AC:
 
 - **Per-UC happy path** for each UC's `[e2e]` AC — does the golden scenario complete?
 - **Edge cases** carried as `[e2e]` AC (cancels, empty inputs, validation failures, hidden-because-no-add-on).
-- **Cross-flow scenarios** — sequences traversing multiple UCs (e.g. UC1 toggle off → UC2 import lands no Sample → UC6 scan creates Sample → UC3 status advances).
-- **Add-on gating regressions** — UC8 AC7 (every Product Hub surface hidden when UI add-on is OFF) and equivalents must be exercised on every new surface.
+- **Cross-flow scenarios** — sequences traversing multiple UCs (e.g. UC1 user toggles off a feature → UC2 a downstream job picks up the new state → UC3 a follow-up user action observes the resulting absence).
+- **Add-on / feature-flag gating regressions** — e.g. an AC like "every gated surface hidden when the add-on / flag is OFF" must be exercised on every new surface, not just the headline one.
 
 ## Output structure
 
@@ -37,7 +37,7 @@ Walk the requirements doc UC by UC and exercise every `[e2e]`-tagged AC:
 # <TASK-KEY> — <feature> · E2E Test
 
 **Date:** <YYYY-MM-DD>
-**Environments:** <local / dev / UAT>
+**Environments:** <list the environments the team ran the E2E against — e.g. `local`, `dev`, `UAT`, `staging`, `preview`, whatever applies>
 **Implementation:** `output/07-impl.md`
 **Requirements:** `output/02-requirements.md`
 
@@ -45,7 +45,7 @@ Walk the requirements doc UC by UC and exercise every `[e2e]`-tagged AC:
 
 | AC ID | Scenario | Steps | Expected | Actual | Verdict |
 |---|---|---|---|---|---|
-| UC4 AC1 | Variants tab on slide-in | 1. … 2. … | Variant cards render with samples + status tags | … | Pass / Fail / Blocked |
+| UC4 AC1 | Detail tab renders | 1. … 2. … | Detail panel renders with the expected sub-sections + status labels | … | Pass / Fail / Blocked |
 
 ## Cross-flow scenarios
 

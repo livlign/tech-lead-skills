@@ -100,7 +100,7 @@ The agent must follow **the team's existing git flow** — do not improvise. Con
 ### Default flow (override per team)
 
 - **Base branch:** cut feature branches from the team's integration branch (typically `main` / `master` / `dev` — check `CLAUDE.md`). Always start with `git checkout <base> && git pull`.
-- **Branch name:** `<scope>/<TICKET-KEY>/<short-slug>` — e.g. `feat/PROJ-1234/sample-logic`. Match existing naming if there's a clear convention in `git log`.
+- **Branch name:** `<scope>/<TICKET-KEY>/<short-slug>` — e.g. `feat/PROJ-1234/lookup-flow`. Match existing naming if there's a clear convention in `git log`.
 - **Commits:** stage specific files only (`git add <path>`, never `-A` / `.`). One logical commit per repo touched is preferred. Never `--no-verify`.
 - **Push:** only after the reviewer has explicitly authorized push for this task. `git push -u origin HEAD` on first push.
 - **PR target:** open PRs against the team's integration branch (often `dev` or `main`).

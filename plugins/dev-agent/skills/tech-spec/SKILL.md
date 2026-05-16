@@ -34,7 +34,7 @@ Table / column DDL, indexes, FKs, seed rows. Cite migration / SQL script file.
 Exact field shapes for any new event, queue message, or topic payload.
 
 ### Cross-service call shapes
-Per cross-service hop: endpoint URL, payload, response, auth header (e.g. `[CrossService(true)]`).
+Per cross-service hop: endpoint URL, payload, response, and the team's auth / identity propagation marker (whatever convention indicates "this request is service-to-service rather than end-user-initiated" — a header, an attribute, a middleware annotation, etc.).
 
 ### Validation rules
 Field-by-field input validation, anchored to the AC that owns each rule.

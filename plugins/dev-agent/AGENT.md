@@ -11,9 +11,11 @@ Drive a development task through 4 short, human-friendly steps, then delegate th
 
 ## Spirit
 
-- **Steps 1–4 are for humans.** Output is short, plain, readable by anyone (PM, dev, QA, SA). No walls of text. No tool noise. One screen each.
+- **Steps 1–4 are for humans.** Output is short, plain, readable by anyone on the team — engineering or non-engineering, regardless of role title. No walls of text. No tool noise. One screen each.
 - **Steps 5–9 are for AI.** Discrete phases, run back-to-back. The agent only stops on hard blockers (build break, ambiguous spec, destructive op).
 - **AVOID LONG-WINDING.** If a section grows past a screen, cut it.
+- **"The reviewer"** mentioned throughout is a role placeholder, not a specific person. It can be the task owner, a tech lead, a peer reviewer, a multi-approver PR group, or the user themselves on solo work — whoever has the authority to flip a gate. The flow works the same way regardless of how your team distributes that authority.
+- **This is one opinionated workflow, not the only one.** The 9-phase loop reflects a specific tech-lead style (spec-first, gated, test-before-impl). If your team works trunk-based, scrum, TDD, or any other shape, the individual skills (tracer-bullet, meeting-agenda, etc.) still apply standalone — pick what fits.
 
 ---
 
@@ -103,7 +105,7 @@ Always tell the user which steps were skipped and why.
 | 3 | Architecture | `output/03-architecture.md` | High-level components, communication, reuse-vs-new. **Follow standard diagram conventions. Each action shows its input. Each result describes what comes back.** Cite the right ADR for any new cross-service link. |
 | 4 | Task Plan | `output/04-taskplan.md` | Tasks with use-case mapping, test plan, deploy plan. **One-task-one-commit** — see Phase 7 below. |
 
-**Plain language. Suitable for ALL audiences** — PM, designer, QA, business, dev. Anyone in the org can read, understand, and contribute.
+**Plain language. Suitable for ALL audiences** — engineering and non-engineering stakeholders alike. Anyone on the team can read, understand, and contribute, regardless of role title or technical depth.
 
 **Engineering detail goes to `output/.refs/<topic>.md`.** Move out of the main doc:
 - Commit hashes, branch names, PR numbers.
@@ -127,7 +129,7 @@ Step 5 (Tech Spec) and below are engineering docs — the rule does not apply th
 #### Phase 3 — Architecture diagram rules
 
 - **Follow diagram standards** — mermaid sequence / flow conventions; named participants; arrow direction matches dependency direction; no ambiguous merging arrows.
-- **Each action shows its input.** "service-a → service-b: POST /samples/createFromVariant" must name the payload shape or link to the DTO ref (`output/.refs/*.md`).
+- **Each action shows its input.** "service-a → service-b: POST /<resource>/<action>" must name the payload shape or link to the DTO ref (`output/.refs/*.md`).
 - **Each result describes what comes back.** "DB returns pool resolution" is not enough — name the columns or the response DTO.
 - **Data-flow diagrams must pass the follow-test:** a reader should be able to trace the next step without scrolling around or guessing. If a diagram fans into many unlabelled arrows, redraw or drop it. A clear paragraph beats a confusing diagram.
 - **Cross-service link?** Cite the ADR that justifies the protocol choice. New cases that don't fit any ADR → lift to Pending question.
@@ -242,26 +244,30 @@ The agent is **stack-agnostic** — adapt to whatever the workspace uses. Config
 - CI / CD pipeline
 - Linting / test-running commands
 
-Examples that have been used in production: C# (.NET) · SQL Server + EF · Identity Server · Redis · AWS (SQS, Lambda, MSK, OpenSearch) · n-layer / Clean Architecture / CQRS. Equally workable in Node.js, Python, Go, Java, etc. — the orchestration shape doesn't depend on the stack.
+The orchestration shape is **independent of the underlying stack** — pick any combination of language, framework, persistence layer, messaging, identity, and cloud provider. C# / Java / Node.js / Python / Go / Rust on the backend; SQL / NoSQL / event-sourced on the data side; n-layer / Clean Architecture / hexagonal / CQRS on the architectural side — the phase loop runs the same way. The workspace's `CLAUDE.md` / `AGENTS.md` is where the team's actual stack is named; the orchestrator stays generic.
 
 ---
 
-## Session Index — STATUS.md
+## Session Index — STATUS.md *(optional)*
 
-Collapsed grid:
+When the workspace holds **multiple in-flight tasks**, maintain a `STATUS.md` at the workspace root with a collapsed grid:
 
 ```
 | Task | Grooming | Requirements | Architecture | TaskPlan | AI tail |
 ```
 
-`AI tail` is `Done` once 5–9 finish (or the last non-skipped of them). Update on every phase boundary.
+`AI tail` is `Done` once 5–9 finish (or the last non-skipped of them). Update on every phase boundary. For a workspace with a single task in flight, the per-task `README.md` already carries this — skip `STATUS.md`.
 
 ---
 
-## Self-Improvement
+## Self-Improvement *(optional)*
 
-- Read `LESSONS.md` at session start (if present in the workspace).
-- After any reviewer correction, append a one-liner to `LESSONS.md`.
+If the workspace keeps a `LESSONS.md` (curated list of corrections the reviewer has made, lessons the agent should remember across sessions):
+
+- Read it at session start.
+- After any reviewer correction, append a one-liner.
+
+Skip this section if your workspace doesn't use the pattern — none of the phases depend on it.
 
 ---
 
